@@ -1,4 +1,3 @@
-
 filetype off                  " required
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
@@ -9,28 +8,56 @@ call vundle#begin()
 "let Vundle manage，Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+
 Plugin 'preservim/nerdtree'
 
+Plugin 'zivyangll/git-blame.vim'
+
+" buffer
+Plugin 'jeetsukumaran/vim-buffergator'
+
+Plugin 'ryanoasis/vim-devicons'
+
+Plugin 'mfussenegger/nvim-dap'
 Plugin 'vim-airline/vim-airline'
 
-" history
-" Plugin 'mbbill/undotree'
+Plugin 'liuchengxu/vim-which-key'
 
-Plugin 'majutsushi/tagbar'
+Plugin 'itchyny/lightline.vim'
+
+" history
+Plugin 'mbbill/undotree'
+
+" rust
+"Plugin 'rust-lang/rust.vim'
+
+" Plugin 'majutsushi/tagbar'
+
+Plugin 'liuchengxu/vista.vim'
 
 Plugin 'Valloric/YouCompleteMe'
 
 Plugin 'Yggdroot/indentLine'
 
+Plugin 'ianva/vim-youdao-translater'
+
 Plugin 'fatih/vim-go'
 " Plugin 'govim/govim'
 
+Plugin 'jiangmiao/auto-pairs'
+
 Plugin 'marijnh/tern_for_vim'
 
-Plugin 'neoclide/coc.nvim',{'branch':'release'}
+Plugin 'neoclide/coc.nvim'
 
 Plugin 'ctrlpvim/ctrlp.vim'
 
+" Plugin 'kamykn/popup-menu.nvim'
+" Plugin 'kamykn/spelunker.vim'
+
+" git插件
+Plugin 'tpope/vim-fugitive'
+" git插件扩展
 Plugin 'airblade/vim-gitgutter'
 
 " test search
@@ -40,7 +67,6 @@ Plugin 'dyng/ctrlsf.vim'
 Plugin 'ptzz/lf.vim'
 
 " fzf
-Plugin 'junegunn/fzf',{'dir':'/usr/local/bin/fzf'}
 Plugin 'junegunn/fzf.vim'
 
 " 终端插件
@@ -53,8 +79,8 @@ Plugin 'Chiel92/vim-autoformat'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 " markdown 插件
-Plugin 'iamcco/mathjax-support-for-mkdp'
-Plugin 'iamcco/markdown-preview.vim'
+" Plugin 'iamcco/mathjax-support-for-mkdp'
+" Plugin 'iamcco/markdown-preview.vim'
 " 配色方案
 " colorscheme neodark
 Plugin 'KeitaNakamura/neodark.vim'
@@ -66,16 +92,19 @@ Plugin 'acarapetis/vim-colors-github'
 Plugin 'rakr/vim-one'
 "pink theme
 Plugin 'nightsense/strawberry'
+Plugin 'vim-airline/vim-airline-themes'
 
 Plugin 'scrooloose/nerdcommenter'
-
-" 代码片段生成
-Plugin 'honza/vim-snippets'
-Plugin 'sirVer/ultisnips'
-
+"
+" " 代码片段生成
+" Plugin 'honza/vim-snippets'
+" Plugin 'sirVer/ultisnips'
+"
 " dockerfile
 Plugin 'ekalinin/dockerfile.vim'
 
+" 翻译
+Plugin 'soimort/translate-shell'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -93,12 +122,16 @@ syntax on
 set cursorline
 set laststatus=2
 " 自动缩进
-set autoindent
+"set autoindent
 set tabstop=4
+set smarttab
+set shiftwidth=4
+set softtabstop=4
 set backspace=eol,start,indent
 " 自动补全
-set complete=.,w,b,u,t,i
+" set complete=.,w,b,u,t,i
 
+set showcmd
 set whichwrap+=<,>,h,l
 " 光标到底部距离
 set scrolloff=3
@@ -108,17 +141,26 @@ set history=1000
 set nobackup
 " 去除vi相关一致性模式
 set nocompatible
+" 设置vim日志
+" set verbose=13
+" set verbosefile=./vim.log
+set cmdheight=2
+set completeopt-=preview
 
 nnoremap m :+10<cr>
 nnoremap , :-10<cr>
+vnoremap m 10<cr>
+vnoremap , 10-
 imap <c-k> <up>
 imap <c-h> <left>
 imap <c-j> <down>
 imap <c-l> <right>
 imap <c-a> <esc>I
 nmap <c-a> ^
+vnoremap <c-a> ^
 inoremap <c-e> <esc>A
 nnoremap <c-e> $
+vnoremap <c-e> $
 imap <c-g> <esc>GG
 imap <c-o> <esc>o
 " nnoremap <c-o> o
@@ -133,32 +175,63 @@ imap <c-p> <esc>pi
 nnoremap <c-G> GG
 imap <c-G> <esc>GG
 imap <c-s> <esc>:w<cr>
-nmap <c-s> :wq<cr>
-nmap <c-q> :q<cr>
-imap <c-q> <esc>:q<cr>
+nmap <c-s> :w<cr>
+nmap <c-q> :FloatermKill!<cr> :wqa<cr>
+imap <c-q> <esc>:FloatermKill!<cr> :wqa<cr>
 nmap L $
 nmap H ^
 noremap <c-w> <c-w>w
-noremap <leader>s :split<cr>
-vmap <c-y> "+y
-nmap <c-v> "+p
+" noremap <leader>s :split<cr>
+vmap <leader>y "+y
+vnoremap <c-d> "+d
+nmap <leader>v "+p
+noremap <c-x> <c-r>
 
+nnoremap <Leader>s :<C-u>call gitblame#echo()<CR>
+" NERDCommenterComment
 map <leader>/ <plug>NERDCommenterComment
 map <leader>. <plug>NERDCommenterUncomment
 
-map <leader>n <esc>:FloatermNew lf<CR>
+" Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+" Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDCommentEmptyLines = 1
+" Use compact syntax for prettified multi-line comments
+let g:NERDCompactSexyComs = 1
+" Add your own custom formats or override the defaults
+let g:NERDCustomDelimiters = { 'go': { 'left': '//','right': '' } }
+" Enable NERDCommenterToggle to check all selected lines is commented or not
+let g:NERDToggleCheckAllLines = 1
+" Enable trimming of trailing whitespace when uncommenting
+let g:NERDTrimTrailingWhitespace = 1
 
-let g:floaterm_keymap_new ='<F9>'
-let g:floaterm_keymap_prev ='<F10>'
-let g:floaterm_keymap_next ='<F11>'
+" floaterm
+map <leader>n <esc>:FloatermNew lf<CR>
+map <leader>ftr :FloatermNew --height=0.3 --wintype=split --position=right <CR>
+
+let g:floaterm_keymap_kill ='<F8>'
+let g:floaterm_keymap_new ='<leader>ft'
+let g:floaterm_keymap_prev ='<F9>'
+let g:floaterm_keymap_next ='<F10>'
 let g:floaterm_keymap_toggle ='<F12>'
+
 " 光标回退
 inoremap <c-t> <esc><c-o>
 nnoremap <c-t> <c-o>
-set autowriteall
+" set autowriteall
 "自动重载
 set autoread
 
+"  光标变细
+if exists('$TMUX')
+	let &t_SI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=1\x7\<Esc>\\"
+	let &t_EI = "\<Esc>Ptmux;\<Esc>\<Esc>]50;CursorShape=0\x7\<Esc>\\"
+else
+	let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+	let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+endif
+:autocmd InsertEnter * set cul
+:autocmd InsertLeave * set nocul
 " 自动格式化
 noremap <c-r> :Autoformat<CR>
 inoremap <c-r> <esc>:Autoformat<CR>
@@ -166,11 +239,28 @@ inoremap <c-r> <esc>:Autoformat<CR>
 " 开启24bit的颜色，开启这个颜色会更漂亮一些
 set termguicolors
 " 配色方案, 可以从上面插件安装中的选择一个使用
-colorscheme  neodark"strawberry-light " 主题
+colorscheme  neodark  " 主题
+" colorscheme   strawberry-light " 主题
+
 
 " 设置vim-go
 map <F5> :GoBuild<CR>
 map <F1> :GoDocBrowser<CR>
+noremap <silent> <space>i :GoImpl
+noremap <silent> fill :GoFillStruct
+" debug
+nnoremap <leader>b :GoDebugBreakpoint<CR>
+nnoremap <leader>c :GoDebugContinue<CR>
+nnoremap <leader>db :GoDebugStart 
+nnoremap <leader>dbc :GoDebugStart . --config=./config/config.go<CR>
+nnoremap <leader>p :GoDebugPrint
+nnoremap <leader>ds :GoDebugStop<CR>
+nnoremap <leader>n :GoDebugNext<CR>
+" quickfix
+map <C-n> :cnext<CR>
+map <C-m> :cprevious<CR>
+nnoremap <leader>a :cclose<CR>
+
 let g:go_fmt_command = "goimports" " 格式化将默认的 gofmt 替换
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
@@ -187,57 +277,80 @@ let g:go_highlight_generate_tags = 1
 
 let g:godef_split=2
 
-" 设置Tagbar
-map <F3> :TagbarToggle<CR>
-" autocmd vimenter * TagbarToggle
+" 设置 vista
+map <F3> :Vista!!<CR>
+let g:lightline = {
+			\ 'colorscheme': 'wombat',
+			\ 'active': {
+				\   'left': [ [ 'mode', 'paste' ],
+				\             [ 'readonly', 'filename', 'modified', 'method' ] ]
+				\ },
+				\ 'component_function': {
+					\   'method': 'NearestMethodOrFunction'
+					\ },
+					\ }
+
+function! NearestMethodOrFunction() abort
+	return get(b:, 'vista_nearest_method_or_function', '')
+endfunction
+
+set statusline+=%{NearestMethodOrFunction()}
+
+" By default vista.vim never run if you don't call it explicitly.
+"
+" If you want to show the nearest function in your statusline automatically,
+" you can add the following line to your vimrc
+autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 
 " NERDTree配置
-nmap <F2> <ESC>:NERDTree<CR>
-let NERDTreeHighlightCursorline = 1       " 高亮当前行
-let NERDTreeShowLineNumbers     = 1       " 显示行号
-" 忽略列表中的文件
-let NERDTreeIgnore = [ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.egg$', '^\.git$', '^\.repo$', '^\.svn$', '^\.hg$','\.swp$','\.swn$' ]
-" 启动 vim 时打开 NERDTree
-" autocmd vimenter * NERDTree
-" 自动转到主窗口
-" autocmd VimEnter * wincmd p
-" 当打开 VIM，没有指定文件时和打开一个目录时，打开 NERDTree
+" nmap <F2> <ESC>:NERDTreeToggle<CR>
+" nnoremap <leader>ff :NERDTreeFind<CR>
+" let NERDTreeHighlightCursorline = 1       " 高亮当前行
+" let NERDTreeShowLineNumbers     = 1       " 显示行号
+" let NERDTreeWinPos = "left"
+" let NERDTreeMinimalUI = 1
+" " 忽略列表中的文件
+" let NERDTreeIgnore = [ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.egg$', '^\.git$', '^\.repo$', '^\.svn$', '^\.hg$','\.swp$','\.swn$' ]
+" " 启动 vim 时打开 NERDTree
+" " autocmd vimenter * NERDTree
+" " 自动转到主窗口
+" " autocmd VimEnter * wincmd p
+" " 当打开 VIM，没有指定文件时和打开一个目录时，打开 NERDTree
 " autocmd StdinReadPre * let s:std_in = 1
 " autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-" autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-" 关闭 NERDTree，当没有文件打开的时候
-"autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
-autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa! | endif
+" " autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+" " 关闭 NERDTree，当没有文件打开的时候
+" "autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
+" autocmd BufEnter * if 0 == len(filter(range(1, winnr('$')), 'empty(getbufvar(winbufnr(v:val), "&bt"))')) | qa | endif
+" autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+"             \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif"
+"
+" let NERDTreeShowHidden=1
+"
 
-let NERDTreeShowHidden=1
-
-" <leader>nt 打开 nerdtree 窗口，在左侧栏显示
-" map <leader>nt :NERDTreeToggle<CR>
-" <leader>tc 关闭当前的 tab
-" map <leader>tc :tabc<CR>
-" <leader>to 关闭所有其他的 tab
-" map <leader>to :tabo<CR>
-" <leader>ts 查看所有打开的 tab
-" map <leader>ts :tabs<CR>
-" <leader>tp 前一个 tab
-" map <leader>tp :tabp<CR>
-" <leader>tn 后一个 tab
-" map <leader>tn :tabn<CR>
-
+" coc-explore
+nmap <F2> <Cmd>CocCommand explorer<CR>
+autocmd BufEnter * if (winnr("$") == 1 && &filetype == 'coc-explorer') | q | endif
+"
 " YCM配置
 let g:ycm_semantic_triggers =  {
-						\ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
-						\ 'cs,lua,javascript': ['re!\w{2}'],
-						\ }
+			\ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
+			\ 'cs,lua,javascript': ['re!\w{2}'],
+			\ }
 
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
+
+
 " -------------------------------------------------------------------------------------------------
 " coc.nvim default settings
 " -------------------------------------------------------------------------------------------------
 
 " if hidden is not set, TextEdit might fail.
 set hidden
+" Some servers have issues with backup files, see #649.
+" set nobackup
+" set nowritebackup
 " Better display for messages
 set cmdheight=2
 " Smaller updatetime for CursorHold & CursorHoldI
@@ -250,14 +363,14 @@ set signcolumn=yes
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
 inoremap <silent><expr> <TAB>
-						\ pumvisible() ? "\<C-n>" :
-						\ <SID>check_back_space() ? "\<TAB>" :
-						\ coc#refresh()
+			\ pumvisible() ? "\<C-n>" :
+			\ <SID>check_back_space() ? "\<TAB>" :
+			\ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
-		let col = col('.') - 1
-		return !col || getline('.')[col - 1]  =~# '\s'
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
 " Use <c-space> to trigger completion.
@@ -269,6 +382,7 @@ nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
+nmap <c-]> <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
@@ -277,11 +391,14 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> U :call <SID>show_documentation()<CR>
 
 " Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
+nmap <silent>rn <Plug>(coc-rename)
+
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Remap for format selected region
-vmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+vmap <c-1>  <Plug>(coc-format-selected)
+nmap <c-1>  <Plug>(coc-format-selected)
 " Show all diagnostics
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
 " Manage extensions
@@ -308,78 +425,89 @@ let g:NERDSpaceDelims = 1
 let g:ctrlsf_backend = 'ag'
 map <c-f> <esc>:CtrlSF
 let g:ctrlsf_auto_focus = {
-						\ "at" : "start",
-						\ }
+			\ "at" : "start",
+			\ }
 let g:ctrlsf_auto_preview = 1
 let g:ctrlsf_preview_position = 'inside'
 let g:ctrlsf_position = 'bottom'
 let g:ctrlsf_default_root = 'project+fw'
 
 " snippets
-let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsExpandTrigger="<tab>"
 
-
-let g:UltiSnipsEditSplit="vertical"
+" let g:UltiSnipsEditSplit="vertical"
 
 " 处理 YouCompleteMe的tab和Snippet冲突问题
-function! g:UltiSnips_Complete()
-		call UltiSnips#ExpandSnippet()
-		if g:ulti_expand_res == 0
-				if pumvisible()
-						return "\<C-n>"
-				else
-						call UltiSnips#JumpForwards()
-						if g:ulti_jump_forwards_res == 0
-								return "\<TAB>"
-						endif
-				endif
-		endif
-		return ""
-endfunction
-
-au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-let g:UltiSnipsJumpForwardTrigger="<c-e>"
-let g:UltiSnipsListSnippets="tab"
-let g:UltiSnipsJumpForwardTrigger="<cr>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-let g:UltiSnipsSnippetDirectories=["UltiSnips","mysnippets"]
-" this mapping Enter key to <C-y> to chose the current highlight item
-" and close the selection list, same as other IDEs.
-" CONFLICT with some plugins like tpope/Endwise
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" vim-workspace
-" let g:workspace_autocreate = 1
-" let g:workspace_session_directory = $HOME . '/.vim/sessions/'
+" function! g:UltiSnips_Complete()
+"     call UltiSnips#ExpandSnippet()
+"     if g:ulti_expand_res == 0
+"         if pumvisible()
+"             return "\<C-n>"
+"         else
+"             call UltiSnips#JumpForwards()
+"             if g:ulti_jump_forwards_res == 0
+"                 return "\<TAB>"
+"             endif
+"         endif
+"     endif
+"     return ""
+" endfunction
+"
+" au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
+" let g:UltiSnipsJumpForwardTrigger="<c-e>"
+" let g:UltiSnipsListSnippets="<c-/>"
+" let g:UltiSnipsJumpForwardTrigger="<cr>"
+" let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+" let g:UltiSnipsSnippetDirectories=["UltiSnips","mysnippets"]
+" " this mapping Enter key to <C-y> to chose the current highlight item
+" " and close the selection list, same as other IDEs.
+" " CONFLICT with some plugins like tpope/Endwise
+" inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+"
 
 " undoTree
-au BufReadPost * call ReadUndo()
-au BufWritePost * call WriteUndo()
 
-func Workspace()
-		let isWork = 0
-		for i in split(expand('%:p'),"/")
-				echo i
-				if isWork==1
-						return  expand('~/UNDO/')i
-				endif
-				if i=="work"
-						let isWork=1
-				endif
-		endfor
-		return expand('%:h')
+noremap <leader>h :UndotreeToggle<cr>
+
+autocmd VimEnter * call SetUndodir()
+
+func SetUndodir()
+	if has("persistent_undo")
+		let target_path = expand('~/.undodir')
+
+		" " create the directory and any parent directories
+		" " if the location does not exist.
+		if !isdirectory(target_path)
+			call mkdir(target_path, "p", 0700)
+		endif
+
+		let &undodir=target_path
+		set undofile
+	endif
 endfunc
 
-func ReadUndo()
-		if filereadable(expand('%:h'). '/UNDO/' . expand('%:t'))
-				rundo %:h/UNDO/%:t
-		endif
-endfunc
-func WriteUndo()
-		let dirname = expand('%:h') . '/UNDO'
-		if !isdirectory(dirname)
-				call mkdir(dirname)
-		endif
-		wundo %:h/UNDO/%:t
+" which-key
+nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
+
+" translate
+vnoremap <silent> <leader>t :<C-u>Ydv<CR>
+nnoremap <silent> <leader>t :<C-u>Ydc<CR>
+" noremap <leader>t :<C-u>Yde<CR>
+"
+" rust ctags
+autocmd BufRead *.rs :setlocal tags=./rusty-tags.vi;/
+
+" buffergator
+let g:buffergator_viewport_split_policy="B"
+let g:buffergator_suppress_keymaps=1
+nnoremap <silent> <leader>w :BuffergatorToggle<CR>
+
+" custom
+noremap <leader>fa :call AddProtoInterface()<CR>
+
+func AddProtoInterface()
+	:%s/_\ cont/ctx\ cont/g
+	:%s/xt,\ _\ \*p/xt,\ request\ \*p/g
+	:%s/,\ _\ \*p/,\ response\ \*p/g
 endfunc
 
