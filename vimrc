@@ -35,7 +35,7 @@ Plugin 'mbbill/undotree'
 
 Plugin 'liuchengxu/vista.vim'
 
-Plugin 'Valloric/YouCompleteMe'
+" Plugin 'Valloric/YouCompleteMe'
 
 Plugin 'Yggdroot/indentLine'
 
@@ -252,7 +252,7 @@ noremap <silent> fill :GoFillStruct
 nnoremap <leader>b :GoDebugBreakpoint<CR>
 nnoremap <leader>c :GoDebugContinue<CR>
 nnoremap <leader>db :GoDebugStart 
-nnoremap <leader>dbc :GoDebugStart . --config=./config/config.go<CR>
+nnoremap <leader>dbc :GoDebugStart . --config=./config/config.yaml<CR>
 nnoremap <leader>p :GoDebugPrint
 nnoremap <leader>ds :GoDebugStop<CR>
 nnoremap <leader>n :GoDebugNext<CR>
@@ -502,7 +502,10 @@ let g:buffergator_viewport_split_policy="B"
 let g:buffergator_suppress_keymaps=1
 nnoremap <silent> <leader>w :BuffergatorToggle<CR>
 
-" custom
+" auto-pairs
+
+
+"custom
 noremap <leader>fa :call AddProtoInterface()<CR>
 
 func AddProtoInterface()
